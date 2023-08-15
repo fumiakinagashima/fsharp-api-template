@@ -9,7 +9,7 @@ open Npgsql.FSharp
 let dbConnection: string = "Host=m4c-database; Database=m4c-db; Username=user; Password=pass;"
 
 type Project = {
-    id: int
+    id: Nullable<int>
     name: string
     phase: int
 }
@@ -24,7 +24,7 @@ let findAll (connection: string) : Project list =
     |> Sql.query "SELECT * FROM project order by id"
     |> Sql.execute (fun read -> 
         {
-            id = read.int "id"
+            id = Nullable(read.int "id")
             name = read.text "name"
             phase = read.int "phase"
         })
@@ -36,7 +36,7 @@ let findById (connection: string) (id: int) : Project =
     |> Sql.parameters [ "ID", Sql.int id ]
     |> Sql.executeRow (fun read -> 
         {
-            id = read.int "id"
+            id = Nullable(read.int "id")
             name = read.text "name"
             phase = read.int "phase"
         })
@@ -54,18 +54,18 @@ let create (connection: string) (project: Project) =
 let update (connection: string) (project: Project) =
     connection
     |> Sql.connect
-    |> Sql.query "UPDATE project SET name = @NAME, phaes = @PHASE WHERE id = @ID;"
+    |> Sql.query "UPDATE project SET name = @NAME, phase = @PHASE WHERE id = @ID;"
     |> Sql.parameters [
         ( "NAME", Sql.text project.name )
         ( "PHASE", Sql.int project.phase )
-        ( "ID", Sql.int project.id )
+        ( "ID", Sql.int project.id.Value )
     ]
     |> Sql.executeNonQuery
 
 let delete (connection: string) (id: int) =
     connection
     |> Sql.connect
-    |> Sql.query "DELETE FROM project id = @ID;"
+    |> Sql.query "DELETE FROM project WHERE id = @ID;"
     |> Sql.parameters [
         ( "ID", Sql.int id )
     ]
@@ -89,6 +89,7 @@ let postHandler =
     fun (next: HttpFunc) (ctx: HttpContext) -> 
         task {
             let! body = ctx.BindJsonAsync<Project>()
+            printf "%A" body
             let result = create dbConnection body
             return! json result next ctx
         }

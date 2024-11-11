@@ -1,5 +1,4 @@
-# M4C Template by F#
+# API Server with F#
 
-This repository is a api template for M4C.
-
-IT stands for **Mutable Modular Monolith Management-system Constructor**.
+Web server with F# fundamental.
+Routing and CRUD with PostgreSQL.

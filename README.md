@@ -1,4 +1,3 @@
-# API Server with F#
+# F# API Template
 
-Web server with F# fundamental.
-Routing and CRUD with PostgreSQL.
+F# API Template is a template for Rest API with F#.
